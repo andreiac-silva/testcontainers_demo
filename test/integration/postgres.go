@@ -15,7 +15,7 @@ type PostgresDatabase struct {
 	instance *postgres.PostgresContainer
 }
 
-func NewPostgresDatabase(ctx context.Context) *PostgresDatabase {
+func NewPostgresDatabase(t *testing.T, ctx context.Context) *PostgresDatabase {
 	pgContainer, err := postgres.RunContainer(ctx,
 		testcontainers.WithImage("postgres:12"),
 		postgres.WithDatabase("test"),
@@ -27,10 +27,7 @@ func NewPostgresDatabase(ctx context.Context) *PostgresDatabase {
 				WithStartupTimeout(5*time.Second),
 		),
 	)
-
-	if err != nil {
-		panic(err)
-	}
+	require.NoError(t, err)
 	return &PostgresDatabase{
 		instance: pgContainer,
 	}

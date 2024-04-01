@@ -42,7 +42,7 @@ func (s *IntegrationTestSuite) TearDownSuite() {
 }
 
 func (s *IntegrationTestSuite) setupDatabase(ctx context.Context) {
-	s.container = integration.NewPostgresDatabase(ctx)
+	s.container = integration.NewPostgresDatabase(s.T(), ctx)
 	dsn := s.container.DSN(s.T(), ctx)
 
 	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))

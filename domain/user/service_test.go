@@ -8,7 +8,7 @@ import (
 )
 
 func (s *IntegrationTestSuite) TestCreate() {
-	userService := NewService(NewRepository(s.Database))
+	userService := NewService(NewRepository(s.db))
 
 	s.Run("service should create the user successfully", func() {
 		// Given
@@ -28,7 +28,7 @@ func (s *IntegrationTestSuite) TestCreate() {
 }
 
 func (s *IntegrationTestSuite) TestFind() {
-	userService := NewService(NewRepository(s.Database))
+	userService := NewService(NewRepository(s.db))
 
 	s.Run("service should return the user successfully", func() {
 		// Given
@@ -60,7 +60,7 @@ func (s *IntegrationTestSuite) TestFind() {
 }
 
 func (s *IntegrationTestSuite) TestFindAll() {
-	userService := NewService(NewRepository(s.Database))
+	userService := NewService(NewRepository(s.db))
 
 	s.Run("service should return all users successfully", func() {
 		// Given

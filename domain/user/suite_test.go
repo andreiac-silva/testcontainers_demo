@@ -23,7 +23,7 @@ func TestSuite(t *testing.T) {
 
 type IntegrationTestSuite struct {
 	suite.Suite
-	Database  *bun.DB
+	db        *bun.DB
 	container *integration.PostgresDatabase
 }
 
@@ -43,10 +43,8 @@ func (s *IntegrationTestSuite) TearDownSuite() {
 
 func (s *IntegrationTestSuite) setupDatabase(ctx context.Context) {
 	s.container = integration.NewPostgresDatabase(s.T(), ctx)
-	dsn := s.container.DSN(s.T(), ctx)
-
-	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
-	s.Database = bun.NewDB(sqldb, pgdialect.New())
+	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(s.container.DSN(s.T(), ctx))))
+	s.db = bun.NewDB(sqldb, pgdialect.New())
 	s.migrate(ctx)
 }
 
@@ -58,7 +56,7 @@ func (s *IntegrationTestSuite) migrate(ctx context.Context) {
 	err = migrations.Discover(os.DirFS("../../migrations"))
 	require.NoError(s.T(), err)
 
-	migrator := migrate.NewMigrator(s.Database, migrations)
+	migrator := migrate.NewMigrator(s.db, migrations)
 	_, err = migrator.Migrate(ctx)
 	require.NoError(s.T(), err)
 }
@@ -68,7 +66,7 @@ func (s *IntegrationTestSuite) initDatabase(ctx context.Context) error {
 		bun.BaseModel `bun:"table:bun_migrations"`
 		*migrate.Migration
 	}
-	_, err := s.Database.NewCreateTable().Model((*hack)(nil)).Table("bun_migrations").Exec(ctx)
+	_, err := s.db.NewCreateTable().Model((*hack)(nil)).Table("bun_migrations").Exec(ctx)
 	require.NoError(s.T(), err)
 	return nil
 }
